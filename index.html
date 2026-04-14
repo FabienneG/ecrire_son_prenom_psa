@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>J'écris mon prénom</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Arial, Helvetica, 'Liberation Sans', FreeSans, sans-serif;
+    background: #FFF8E7;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* ===== ÉCRAN ACCUEIL ===== */
+  #screen-accueil {
+    width: 100%;
+    max-width: 900px;
+    text-align: center;
+  }
+  #screen-accueil h1 {
+    font-size: 2.2em;
+    color: #E07B39;
+    margin-bottom: 10px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  #screen-accueil p {
+    font-size: 1.3em;
+    color: #555;
+    margin-bottom: 25px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  .prenoms-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+  .btn-prenom {
+    background: #4A90D9;
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 18px 28px;
+    font-size: 1.4em;
+    font-family: Arial, Helvetica, sans-serif;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    min-width: 130px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .btn-prenom:hover { background: #2e6db4; transform: scale(1.05); }
+  .btn-prenom:active { transform: scale(0.97); }
+
+  /* ===== ÉCRAN JEU ===== */
+  #screen-jeu {
+    display: none;
+    width: 100%;
+    max-width: 780px;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .top-bar {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .eleve-badge {
+    background: #4A90D9;
+    color: white;
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-size: 1.1em;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  /* Capsule prénom modèle */
+  .capsule-mot {
+    background: white;
+    border: 4px solid #E07B39;
+    border-radius: 24px;
+    padding: 18px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    width: 100%;
+  }
+  .mot-modele {
+    font-size: 3em;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #333;
+    letter-spacing: 6px;
+    font-weight: bold;
+  }
+
+  /* Zone saisie */
+  .zone-saisie {
+    background: white;
+    border: 3px solid #ccc;
+    border-radius: 20px;
+    padding: 16px 32px;
+    min-height: 80px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3em;
+    font-family: Arial, Helvetica, sans-serif;
+    letter-spacing: 6px;
+    color: #222;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+    word-break: break-all;
+  }
+  .zone-saisie.correct { border-color: #4CAF50; background: #F0FFF0; }
+  .zone-saisie.erreur  { border-color: #E53935; background: #FFF0F0; }
+  .curseur {
+    display: inline-block;
+    width: 3px;
+    height: 1em;
+    background: #333;
+    margin-left: 2px;
+    animation: cligno 0.8s infinite;
+    vertical-align: middle;
+  }
+  @keyframes cligno { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* Feedback */
+  .feedback {
+    font-size: 1.4em;
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 36px;
+    text-align: center;
+    font-weight: bold;
+  }
+  .feedback.ok  { color: #4CAF50; }
+  .feedback.ko  { color: #E53935; }
+
+  /* Clavier */
+  .clavier {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(4px, 1.2vw, 8px);
+    align-items: center;
+    overflow: hidden;
+  }
+  .rangee {
+    display: flex;
+    gap: clamp(2px, 1vw, 7px);
+    justify-content: center;
+    width: 100%;
+  }
+  .touche {
+    background: white;
+    border: 3px solid #BBB;
+    border-radius: 12px;
+    width: clamp(30px, 9vw, 64px);
+    height: clamp(44px, 9vw, 64px);
+    font-size: clamp(0.9em, 3vw, 1.6em);
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+    transition: transform 0.08s, background 0.1s;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+    display: flex; align-items: center; justify-content: center;
+    user-select: none;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .touche:active { background: #DDEEFF; transform: scale(0.93); }
+  .touche-effacer {
+    background: #FFE0E0;
+    border-color: #E57373;
+    color: #C62828;
+    width: auto;
+    flex: 1;
+    max-width: 160px;
+    font-size: clamp(0.8em, 2.5vw, 1.2em);
+    padding: 0 8px;
+  }
+  .touche-valider {
+    background: #E8F5E9;
+    border-color: #66BB6A;
+    color: #2E7D32;
+    width: auto;
+    flex: 1;
+    max-width: 160px;
+    font-size: clamp(0.8em, 2.5vw, 1.2em);
+    padding: 0 8px;
+  }
+
+  /* Écran fin */
+  #screen-fin {
+    display: none;
+    text-align: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  #screen-fin h2 {
+    font-size: 2.5em;
+    color: #E07B39;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  #screen-fin p {
+    font-size: 1.4em;
+    color: #555;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  .btn-rejouer {
+    background: #4A90D9;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 16px 40px;
+    font-size: 1.4em;
+    font-family: Arial, Helvetica, sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .btn-rejouer:hover { background: #2e6db4; }
+</style>
+</head>
+<body>
+
+<!-- ÉCRAN ACCUEIL -->
+<div id="screen-accueil">
+  <h1>👋 Bonjour !</h1>
+  <p>Clique sur ton prénom pour commencer</p>
+  <div class="prenoms-grid" id="prenoms-grid"></div>
+</div>
+
+<!-- ÉCRAN JEU -->
+<div id="screen-jeu">
+  <div class="top-bar">
+    <div class="eleve-badge" id="badge-prenom"></div>
+  </div>
+  <div class="capsule-mot">
+    <span class="mot-modele" id="mot-modele"></span>
+  </div>
+  <div class="zone-saisie" id="zone-saisie"><span class="curseur"></span></div>
+  <div class="feedback" id="feedback"></div>
+  <div class="clavier" id="clavier"></div>
+</div>
+
+<!-- ÉCRAN FIN -->
+<div id="screen-fin">
+  <h2>🎉 Bravo !</h2>
+  <p id="msg-fin"></p>
+  <button class="btn-rejouer" onclick="rejouer()">Recommencer</button>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkR2_dEkgds8npVhdy3t7mivgYBa0n2psPmn53l9bLB8vuTRK0ozcZN8No3N_6IIwyxQ/exec";
+
+const PRENOMS = [
+  "VICTOR H","ELLA","ELIYAS","LEYA","ANTONIA",
+  "DARIO","ZEYN","PERI","DAVID","NAYLA",
+  "VICTOR O","ISMENE","VICTORIA","HEDI","RYAN",
+  "ANATOLE","MARC","OLIVIER","NOAH","AUDREY"
+];
+
+const RANGEES = [
+  ["A","B","C","D","E","F","G","H","I"],
+  ["J","K","L","M","N","O","P","Q","R"],
+  ["S","T","U","V","W","X","Y","Z"]
+];
+
+let eleveActif = "";
+let saisie = "";
+let valide = false;
+
+function initAccueil() {
+  const grid = document.getElementById("prenoms-grid");
+  grid.innerHTML = "";
+  PRENOMS.forEach(p => {
+    const btn = document.createElement("button");
+    btn.className = "btn-prenom";
+    btn.textContent = p;
+    btn.onclick = () => demarrer(p);
+    grid.appendChild(btn);
+  });
+}
+
+function demarrer(prenom) {
+  eleveActif = prenom;
+  saisie = "";
+  valide = false;
+  document.getElementById("screen-accueil").style.display = "none";
+  const jeu = document.getElementById("screen-jeu");
+  jeu.style.display = "flex";
+  document.getElementById("badge-prenom").textContent = "👤 " + prenom;
+  // Affiche le prénom sans le suffixe H/O pour VICTOR
+  const affichage = normaliser(prenom);
+  document.getElementById("mot-modele").textContent = affichage;
+  buildClavier();
+  resetZone();
+}
+
+function normaliser(s) {
+  return s.toUpperCase()
+    .replace(/[ÉÈÊË]/g,"E")
+    .replace(/[ÀÂÄ]/g,"A")
+    .replace(/[ÙÛÜ]/g,"U")
+    .replace(/[ÔÖÒ]/g,"O")
+    .replace(/[ÎÏÌ]/g,"I")
+    .replace(/Ç/g,"C");
+}
+
+function resetZone() {
+  saisie = "";
+  valide = false;
+  const z = document.getElementById("zone-saisie");
+  z.className = "zone-saisie";
+  z.innerHTML = '<span class="curseur"></span>';
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("feedback").className = "feedback";
+}
+
+function buildClavier() {
+  const div = document.getElementById("clavier");
+  div.innerHTML = "";
+  RANGEES.forEach(r => {
+    const rangee = document.createElement("div");
+    rangee.className = "rangee";
+    r.forEach(l => {
+      const t = document.createElement("button");
+      t.className = "touche";
+      t.textContent = l;
+      t.onclick = () => presserLettre(l);
+      rangee.appendChild(t);
+    });
+    div.appendChild(rangee);
+  });
+  const actions = document.createElement("div");
+  actions.className = "rangee";
+  const eff = document.createElement("button");
+  eff.className = "touche touche-effacer";
+  eff.textContent = "⌫ Effacer";
+  eff.onclick = effacer;
+  actions.appendChild(eff);
+  const val = document.createElement("button");
+  val.className = "touche touche-valider";
+  val.textContent = "✓ Valider";
+  val.onclick = valider;
+  actions.appendChild(val);
+  div.appendChild(actions);
+}
+
+function presserLettre(l) {
+  if (valide) return;
+  saisie += l;
+  majZone();
+}
+
+function effacer() {
+  if (valide) return;
+  saisie = saisie.slice(0, -1);
+  majZone();
+}
+
+function majZone() {
+  const z = document.getElementById("zone-saisie");
+  z.innerHTML = saisie + '<span class="curseur"></span>';
+  z.className = "zone-saisie";
+  document.getElementById("feedback").textContent = "";
+}
+
+function valider() {
+  if (valide || saisie.length === 0) return;
+  const attendu = normaliser(eleveActif);
+  const saisi   = normaliser(saisie);
+  const correct = saisi === attendu;
+  const z  = document.getElementById("zone-saisie");
+  const fb = document.getElementById("feedback");
+
+  envoyerSheets(eleveActif, saisie, correct);
+
+  if (correct) {
+    z.className = "zone-saisie correct";
+    fb.textContent = "🌟 Bravo !";
+    fb.className = "feedback ok";
+    valide = true;
+    setTimeout(() => terminer(), 1500);
+  } else {
+    z.className = "zone-saisie erreur";
+    fb.textContent = "😊 Essaie encore !";
+    fb.className = "feedback ko";
+    saisie = "";
+    setTimeout(() => {
+      z.className = "zone-saisie";
+      z.innerHTML = '<span class="curseur"></span>';
+      fb.textContent = "";
+      fb.className = "feedback";
+    }, 1000);
+  }
+}
+
+function terminer() {
+  document.getElementById("screen-jeu").style.display = "none";
+  const fin = document.getElementById("screen-fin");
+  fin.style.display = "flex";
+  fin.style.flexDirection = "column";
+  document.getElementById("msg-fin").textContent = eleveActif + ", tu as bien écrit ton prénom ! 🎊";
+}
+
+function rejouer() {
+  document.getElementById("screen-fin").style.display = "none";
+  document.getElementById("screen-accueil").style.display = "block";
+}
+
+function envoyerSheets(prenom, tentative, correct) {
+  const now = new Date();
+  const date = now.toLocaleDateString("fr-FR");
+  const heure = now.toLocaleTimeString("fr-FR");
+  const params = new URLSearchParams({
+    prenom, mot: prenom, tentative,
+    correct: correct ? "OUI" : "NON",
+    date, heure
+  });
+  const img = new Image();
+  img.src = SCRIPT_URL + "?" + params.toString();
+}
+
+initAccueil();
+</script>
+</body>
+</html>
